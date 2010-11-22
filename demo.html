@@ -1,0 +1,53 @@
+<html>
+<head>
+<script src="blowfish_cbc.js"></script>
+</head>
+<body>
+<h3>Blowfish_CBC Demo</h3>
+<script>
+<!--
+
+/* wrapper functions to make use of the Blowfish object easier */
+var bf;
+function encrypt(data,hexkey) {
+  /* create new object only if key is different */
+  if(typeof(bf) == 'undefined' || bf.key != hexkey)
+  bf = new Blowfish(hexkey);
+  /* generate random IV */
+  bf.iv = '';
+  for(var i = 0; i < 16; i++)
+    bf.iv += '0123456789ABCDEF'[Math.floor(Math.random() * 16)];
+  /*
+   * Use this line if you want to output raw (unescaped) ciphertext:
+   * return bf.unescape(bf.iv + bf.encrypt(data));
+   */
+  return bf.iv + bf.encrypt(data);
+}
+function decrypt(data,hexkey) {
+  /*
+   * Use this line if you want to supply raw (unescaped) ciphertext:
+   * data =  bf.escape(data);
+   */
+  /* create new object only if key is different */
+  if(typeof(bf) == 'undefined' || bf.key != hexkey)
+  bf = new Blowfish(hexkey);
+  /* load IV from beginning of data */
+  if(data.length < 16) throw 'data too short to contain IV';
+  bf.iv = data.substr(0, 16);
+  /* decrypt the data */
+  var plain = bf.decrypt(data.substr(16));
+  return plain;
+}
+
+/* show that this works */
+var plain = 'this is a test';
+var key = '1234567890ABCDEF1234567890ABCDEF';
+document.write('Plain: ' + plain + '<br/>');
+var enc = encrypt(plain, key);
+document.write('Encrypted: ' + enc + '<br/>');
+document.write('Decrypted: ' + decrypt(enc, key) + '<br/>');
+
+//-->
+</script>
+</body>
+</html>
